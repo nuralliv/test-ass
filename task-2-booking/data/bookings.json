@@ -1,0 +1,38 @@
+[
+  {
+    "id": "bk-1",
+    "masterId": "m-1",
+    "serviceId": "s-cut",
+    "start": "2030-11-18T05:00:00.000Z",
+    "end": "2030-11-18T06:00:00.000Z",
+    "clientPhone": "+77012345678",
+    "status": "active"
+  },
+  {
+    "id": "bk-2",
+    "masterId": "m-1",
+    "serviceId": "s-brows",
+    "start": "2030-11-18T07:30:00.000Z",
+    "end": "2030-11-18T08:00:00.000Z",
+    "clientPhone": "+77071112233",
+    "status": "active"
+  },
+  {
+    "id": "bk-3",
+    "masterId": "m-1",
+    "serviceId": "s-cut",
+    "start": "2030-11-18T11:00:00.000Z",
+    "end": "2030-11-18T12:00:00.000Z",
+    "clientPhone": "+77475550011",
+    "status": "cancelled"
+  },
+  {
+    "id": "bk-4",
+    "masterId": "m-2",
+    "serviceId": "s-mani",
+    "start": "2030-11-19T04:00:00.000Z",
+    "end": "2030-11-19T05:30:00.000Z",
+    "clientPhone": "+77019998877",
+    "status": "active"
+  }
+]

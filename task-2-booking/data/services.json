@@ -1,0 +1,5 @@
+[
+  { "id": "s-cut", "name": "Стрижка", "durationMin": 60, "masterIds": ["m-1", "m-2"] },
+  { "id": "s-mani", "name": "Маникюр", "durationMin": 90, "masterIds": ["m-2"] },
+  { "id": "s-brows", "name": "Коррекция бровей", "durationMin": 30, "masterIds": ["m-1"] }
+]
