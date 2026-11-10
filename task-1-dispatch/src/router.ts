@@ -1,37 +1,40 @@
-import type { Assignment, Branch, Order } from './types.ts';
+import type { Assignment, Branch, Order, Rule } from './types.ts';
 import { distanceKm } from './geo.ts';
 
-export function assignBranch(order: Order, branches: Branch[]): Assignment {
+export const MAX_DISTANCE_KM = 42;
+
+export function assignBranch(order: Order, branches: Branch[], load: (branchId: string) => number = () => 0): Assignment {
   const own = branches.filter((b) => b.storeId === order.storeId && b.active);
+  const result = (branchId: string | null, rule: Rule): Assignment => ({ orderId: order.id, branchId, rule });
+  const available = (b: Branch) => load(b.id) < b.dailyLimit;
+  const geo = (candidates: Branch[]): Assignment => {
+    const nearest = findNearest(order, candidates);
+    if (!nearest) return result(null, 'unassigned');
+    return nearest.distance > MAX_DISTANCE_KM ? result(null, 'too_far') : result(nearest.branch.id, 'geo');
+  };
+  const select = (branch: Branch, rule: Rule): Assignment => available(branch)
+    ? result(branch.id, rule)
+    : geo(own.filter(available));
 
-  if (order.manualBranchId) {
-    const manual = own.find((b) => b.id === order.manualBranchId);
-    if (manual) return { orderId: order.id, branchId: manual.id, rule: 'manual' };
-  }
-
-  if (own.length === 1) {
-    return { orderId: order.id, branchId: own[0].id, rule: 'single' };
-  }
-
-  // TODO: pickup_point, city
-
-  const nearest = findNearest(order, own);
-  if (nearest) return { orderId: order.id, branchId: nearest.id, rule: 'geo' };
-
-  return { orderId: order.id, branchId: null, rule: 'unassigned' };
+  const manual = own.find((b) => b.id === order.manualBranchId);
+  if (manual) return result(manual.id, 'manual');
+  if (own.length === 1) return select(own[0], 'single');
+  const pickup = order.pickupPointId && own.find((b) => b.pickupPointIds.includes(order.pickupPointId!));
+  if (pickup) return select(pickup, 'pickup_point');
+  const city = own.filter((b) => b.city === order.city);
+  if (city.length === 1) return select(city[0], 'city');
+  const nearest = findNearest(order, city.length > 1 ? city : own);
+  if (!nearest) return result(null, 'unassigned');
+  if (!available(nearest.branch)) return geo(own.filter(available));
+  return geo([nearest.branch]);
 }
 
-function findNearest(order: Order, branches: Branch[]): Branch | null {
-  if (order.lat === null || order.lon === null) return null;
-
-  let best: Branch | null = null;
-  let bestDist = Infinity;
-  for (const b of branches) {
-    const d = distanceKm(order.lat, order.lon, b.lon, b.lat);
-    if (d < bestDist) {
-      best = b;
-      bestDist = d;
-    }
+function findNearest(order: Order, branches: Branch[]): { branch: Branch; distance: number } | null {
+  if (order.lat === null || order.lon === null || !Number.isFinite(order.lat) || !Number.isFinite(order.lon)) return null;
+  let best: { branch: Branch; distance: number } | null = null;
+  for (const branch of branches) {
+    const distance = distanceKm(order.lat, order.lon, branch.lat, branch.lon);
+    if (Number.isFinite(distance) && (!best || distance < best.distance)) best = { branch, distance };
   }
   return best;
 }
