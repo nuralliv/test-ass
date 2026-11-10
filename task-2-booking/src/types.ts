@@ -1,6 +1,5 @@
 export type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
-// Время 'HH:mm', местное (Алматы)
 export type TimeRange = { from: string; to: string };
 
 export type WorkDay = TimeRange & { breaks: TimeRange[] };
@@ -22,7 +21,6 @@ export type Booking = {
   id: string;
   masterId: string;
   serviceId: string;
-  // ISO, UTC
   start: string;
   end: string;
   clientPhone: string;

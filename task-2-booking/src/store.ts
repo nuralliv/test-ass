@@ -13,7 +13,6 @@ export const services: Service[] = load('services.json');
 
 const bookings: Booking[] = load('bookings.json');
 
-// Имитация сетевой задержки до БД. Не убирать: в проде запросы тоже не мгновенные.
 const latency = () => new Promise((r) => setTimeout(r, 5 + Math.random() * 15));
 
 export const bookingRepo = {
